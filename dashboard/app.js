@@ -25,6 +25,7 @@
     ['multiple', 'Cat. mcap/TVL', 'num'],
     ['implied_value_usd', 'Implied value', 'num'],
     ['airdrop_per_1k_usd', 'Drop / $1k', 'num'],
+    ['farm_cost', 'Farm: capital · gas · hold', ''],
   ];
 
   // ---------- formatting ----------
@@ -77,6 +78,7 @@
   function sortKey(r, k) {
     if (k === 'multiple') return r.factors.multiple;
     if (k === 'name') return r.name.toLowerCase();
+    if (k === 'farm_cost') return r.farm.capital_usd + r.farm.gas_usd;
     return r[k];
   }
 
@@ -142,8 +144,9 @@
       <td class="num">${x(r.factors.multiple)}</td>
       <td class="num"><span class="val">${usd(r.implied_value_usd)}</span> <span class="bar"><i style="width:${Math.max(2, Math.sqrt(r.implied_value_usd / maxVal) * 100).toFixed(1)}%"></i></span></td>
       <td class="num">${usd(r.airdrop_per_1k_usd)}</td>
+      <td class="farm"><b>${esc(r.farm.play)}</b><small>$${r.farm.capital_usd.toLocaleString('en-US')} · ~$${r.farm.gas_usd} gas · ${r.farm.hold_days} d</small></td>
     </tr>`).join('');
-    app.replaceChildren(f, el(`<div class="tablewrap"><table><thead><tr>${head}</tr></thead><tbody>${body || '<tr><td colspan="9" class="muted">No protocol matches these filters.</td></tr>'}</tbody></table></div>`));
+    app.replaceChildren(f, el(`<div class="tablewrap"><table><thead><tr>${head}</tr></thead><tbody>${body || '<tr><td colspan="10" class="muted">No protocol matches these filters.</td></tr>'}</tbody></table></div>`));
     wireBoard();
   }
 
@@ -196,9 +199,13 @@
         <div><b>${x(r.implied_mcap_to_tvl)}</b><span>implied mcap / TVL</span></div>
         <div><b>${usd(r.airdrop_per_1k_usd)}</b><span>per $1k if ${Math.round(m.airdrop_share * 100)}% goes to TVL</span></div>
       </div>
+      <div class="dgrid"><div>
       <h3>How the value is built</h3><div class="chain">${chainHtml}</div>
       ${cal && cal.examples.length ? `<p class="muted">Category peers that trade: ${cal.examples.map(esc).join(', ')}.</p>` : ''}
-      <h3>Farm plan · ${r.farm_plan.length} steps</h3><ol class="plan">${plan}</ol>`;
+      </div><div>
+      <h3>Farm plan · ${esc(r.farm.play)}</h3>
+      <div class="sum"><div><b>$${r.farm.capital_usd.toLocaleString('en-US')}</b><span>capital, recoverable</span></div><div><b>~$${r.farm.gas_usd}</b><span>gas, whole window</span></div><div><b>${r.farm.hold_days} days</b><span>hold</span></div><div><b>${Math.round(r.farm.hands_on_minutes / 6) / 10} h</b><span>hands-on time</span></div></div>
+      <ol class="plan">${plan}</ol></div></div>`;
     drawer.classList.add('open');
     drawer.setAttribute('aria-hidden', 'false');
     drawer.querySelector('#close').addEventListener('click', () => { S.p = ''; update(); });

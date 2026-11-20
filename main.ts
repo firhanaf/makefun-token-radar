@@ -11,7 +11,7 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSyn
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { MODEL, calibrate, factorsFor, implied, isDerivative, isPreToken, structureReason, type Snapshot, type SnapshotProtocol } from './lib/model.ts';
-import { farmPlan, stepText } from './lib/farm.ts';
+import { farmPlan, planSummary, stepText } from './lib/farm.ts';
 import { buildDossier } from './vendor/makefun-board.ts';
 
 const here = fileURLToPath(new URL('.', import.meta.url));
@@ -70,6 +70,7 @@ const rows = scored.map((s, i) => ({
   factors: s.f,
   structure_note: structureReason(s.p),
   airdrop_per_1k_usd: Math.round((1000 / s.p.tvl_usd) * s.value * MODEL.airdrop_share * 100) / 100,
+  farm: planSummary(s.p, s.f.age_days),
   farm_steps: s.steps.map(stepText),
   farm_plan: s.steps,
 }));

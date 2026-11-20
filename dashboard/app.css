@@ -47,7 +47,7 @@ main { padding: 14px 24px 24px; }
 
 .tablewrap { border: 1px solid var(--line); border-radius: var(--r); overflow: auto; max-height: calc(100vh - 230px); background: var(--panel); }
 table { border-collapse: collapse; width: 100%; }
-th, td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: left; }
+th, td { padding: 5px 10px; border-bottom: 1px solid var(--line); text-align: left; }
 th { position: sticky; top: 0; background: var(--panel-2); font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; user-select: none; white-space: nowrap; }
 th[aria-sort] { color: var(--text); }
 th[aria-sort="ascending"]::after { content: " ▲"; }
@@ -67,12 +67,20 @@ td.name small { color: var(--muted); }
 .tag.early { border-color: #6b5bd6; color: var(--violet); }
 .tag.derivative { border-color: #7a5a1a; color: var(--warn); }
 
-.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 560px; max-width: 100%; background: var(--panel); border-left: 1px solid var(--line); box-shadow: -18px 0 40px #0008; overflow-y: auto; padding: 20px 24px; transform: translateX(100%); transition: transform .18s ease; }
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 1040px; max-width: 100%; background: var(--panel); border-left: 1px solid var(--line); box-shadow: -18px 0 40px #0008; overflow-y: auto; padding: 20px 24px; transform: translateX(100%); transition: transform .18s ease; }
 .drawer.open { transform: none; }
 .drawer h2 { margin: 0 0 4px; font-size: 22px; }
 .drawer h3 { margin: 18px 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); }
 .close { float: right; background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
-.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.facts { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.dgrid { display: grid; grid-template-columns: 1fr 1.25fr; gap: 24px; align-items: start; }
+.sum { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; }
+.sum div { border: 1px solid var(--accent-dim); border-radius: 6px; padding: 6px 8px; }
+.sum b { display: block; color: var(--accent); font-variant-numeric: tabular-nums; }
+.sum span { font-size: 11px; color: var(--muted); }
+td.farm b { display: block; font-weight: 500; font-size: 12.5px; }
+td.farm small { color: var(--muted); white-space: nowrap; }
+@media (max-width: 1100px) { .dgrid, .facts { grid-template-columns: 1fr 1fr; } .kpis { grid-template-columns: repeat(2, 1fr); } }
 .facts div { background: var(--panel-2); border-radius: 6px; padding: 8px 10px; }
 .facts b { display: block; font-variant-numeric: tabular-nums; }
 .facts span { font-size: 11.5px; color: var(--muted); }
@@ -81,7 +89,7 @@ td.name small { color: var(--muted); }
 .chain .why { color: var(--muted); font-size: 12px; }
 .chain .total { font-weight: 700; color: var(--accent); border: 0; }
 ol.plan { list-style: none; padding: 0; margin: 0; counter-reset: s; }
-ol.plan li { counter-increment: s; position: relative; padding: 9px 10px 9px 40px; margin-bottom: 6px; background: var(--panel-2); border-radius: 6px; }
+ol.plan li { counter-increment: s; position: relative; padding: 7px 10px 7px 40px; margin-bottom: 5px; font-size: 13px; background: var(--panel-2); border-radius: 6px; }
 ol.plan li::before { content: counter(s); position: absolute; left: 10px; top: 9px; width: 20px; height: 20px; border-radius: 50%; background: var(--accent-dim); color: var(--text); font-size: 12px; text-align: center; line-height: 20px; }
 ol.plan .ph { font-size: 10.5px; text-transform: uppercase; letter-spacing: .6px; color: var(--violet); }
 ol.plan .ct { display: flex; gap: 14px; margin-top: 4px; font-size: 12px; color: var(--muted); }

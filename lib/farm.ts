@@ -39,7 +39,7 @@ export function holdDays(age: number | null): number {
 }
 
 interface Play {
-  enter: (n: string, cap: number, chain: string) => string;
+  enter: (n: string, cap: string, chain: string) => string;
   keep: string;
   risk: string;
 }
@@ -84,7 +84,7 @@ function playFor(category: string | null): Play {
     risk: 'redemptions can be gated or delayed: read the redemption terms',
   };
   if (fam(['prediction', 'gaming', 'social', 'nft'])) return {
-    enter: (n, cap, ch) => `Fund the account with $${Math.min(cap, 300)} on ${ch} and make your first few small positions or actions on ${n}.`,
+    enter: (n, cap, ch) => `Fund the account with $${cap} on ${ch} (a third of it is enough to start) and make your first few small positions or actions on ${n}.`,
     keep: 'Be active on several separate days each week; streaks and active days usually count more than size.',
     risk: 'activity rewards favour consistency: a missed fortnight can reset a tier',
   };
@@ -104,6 +104,7 @@ export function farmPlan(p: SnapshotProtocol, age: number | null): Step[] {
   const chain = p.chains[0] ?? 'its main chain';
   const gas = gasPerTx(chain);
   const cap = capitalFor(p.tvl_usd);
+  const capText = cap.toLocaleString('en-US');
   const hold = holdDays(age);
   const play = playFor(p.category);
   const share = (cap / p.tvl_usd) * 100;
@@ -126,8 +127,8 @@ export function farmPlan(p: SnapshotProtocol, age: number | null): Step[] {
     },
     {
       phase: 'enter',
-      text: `${play.enter(p.name, cap, chain)} At $${cap} you are ${share < 0.001 ? 'under 0.001' : share.toFixed(3)}% of its TVL.`,
-      cost: `$${cap} of capital (recoverable) plus ${gas.label} gas`,
+      text: `${play.enter(p.name, capText, chain)} At $${capText} you are ${share < 0.001 ? 'under 0.001' : share.toFixed(3)}% of its TVL.`,
+      cost: `$${capText} of capital (recoverable) plus ${gas.label} gas`,
       time: '15 minutes',
     },
     {
@@ -155,6 +156,28 @@ export function farmPlan(p: SnapshotProtocol, age: number | null): Step[] {
       time: '15 minutes on launch day',
     },
   ];
+}
+
+/** A plan's totals, so a reader can compare farms on what they cost and how long they take. */
+export interface PlanSummary {
+  capital_usd: number;
+  gas_usd: number;
+  hold_days: number;
+  hands_on_minutes: number;
+  play: string;
+}
+
+export function planSummary(p: SnapshotProtocol, age: number | null): PlanSummary {
+  const gas = gasPerTx(p.chains[0] ?? '');
+  const hold = holdDays(age);
+  const weeks = Math.ceil(hold / 7);
+  // setup (6 tx) + entry (2 tx) + two a week + exit and claim (3 tx)
+  const gasUsd = gas.usd * (6 + 2 + 2 * weeks + 3);
+  // 20 + 10 + 15 minutes to start, 15 a week (activity and the exit check), 15 at launch
+  const minutes = 45 + 15 * weeks + 15;
+  const c = (p.category ?? 'other').toLowerCase();
+  const play = /lend|cdp|credit/.test(c) ? 'supply + borrow' : /dex|liquidity|farm|leveraged/.test(c) ? 'LP + swaps' : /deriv|perp|option|basis/.test(c) ? 'delta-neutral volume' : /stak|restak|btc/.test(c) ? 'stake + use receipt' : /bridge/.test(c) ? 'bridge both ways' : /curator|allocator|yield|aggregator|onchain capital/.test(c) ? 'vault deposit' : /rwa|stable|treasur|cedefi/.test(c) ? 'mint + use asset' : /prediction|gaming|social|nft/.test(c) ? 'daily activity' : /chain/.test(c) ? 'use native apps' : 'deposit';
+  return { capital_usd: capitalFor(p.tvl_usd), gas_usd: Math.max(1, Math.round(gasUsd)), hold_days: hold, hands_on_minutes: minutes, play };
 }
 
 export function stepText(s: Step): string {
